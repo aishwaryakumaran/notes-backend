@@ -1,0 +1,10 @@
+/* You can add global styles to this file, and also import other style files */
+
+.invalid-field {
+    border-color: #F44336 !important;
+  }
+
+  .invalid-feedback
+  {
+color: #F44336;
+  }

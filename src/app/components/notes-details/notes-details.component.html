@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+  width:100%;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 15px;
+  text-align: left;
+}
+#t01 tr:nth-child(even) {
+  background-color: #eee;
+}
+#t01 tr:nth-child(odd) {
+ background-color: #fff;
+}
+#t01 th {
+  background-color: black;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<h2>ProductDetail</h2>
+
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Description</th>
+
+  </tr>
+  <tr *ngFor="let notes of orderList | paginate: {currentPage: pageNumber, itemsPerPage: pageSize, totalItems:totalcount};let
+  i=index">
+    <td>{{order.orderNo}}</td>
+    <td>{{order.itemdetails.itemName}}</td>
+    <td><button type="button"  
+      (click)="OpenMViewModel('viewNotes',notes.id)">View</button></td>
+      <td><button type="button"  
+        (click)="OpenDeleteModel('DeleteNotes',notes.id)">Delete</button></td>
+        <td><button type="button"  
+          (click)="OpenEditModel('editNotes',notes.id)">Edit</button></td>
+  </tr>
+ </table>
+<br>
+<!-- *ngIf="orderList.length > 0 " -->
+<div class="mt-4 position-relative d-inline-block" >
+  <pagination-controls (pageChange)="pageChange($event)" maxSize="7" previousLabel="" nextLabel="">
+  </pagination-controls>
+</div>
+
+</body>
+</html>
+<ng-template #viewNotes>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left w-100 text-center fs18 font-weight-normal">Edit Notes</h4>
+    <button type="button" class="close pull-right text-white font-weight-normal op1" aria-label="Close" (click)="closePopup()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="noteForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+          <label >title:</label><br/>
+          <input type="text" formControlName="title" class="form-control"/>
+      </div><br/><br/><br/>
+      <div class="form-group">
+          <label >Description:</label><br/>
+          <textarea formControlName="description" class="form-control"  rows="4" cols="50"></textarea>
+      </div>
+  </form>
+  </div>
+</ng-template>
+
+
+<ng-template #editNotes>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left w-100 text-center fs18 font-weight-normal">Edit Notes</h4>
+    <button type="button" class="close pull-right text-white font-weight-normal op1" aria-label="Close" (click)="closePopup()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="noteForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+          <label >title:</label><br/>
+          <input type="text" formControlName="title" class="form-control" [ngClass]="{ 'invalid-field': submitted && f.title.errors }" />
+          <div *ngIf="submitted && f.title.errors" class="invalid-feedback">
+              <div *ngIf="f.title.errors.required">title is required</div>
+          </div>
+      </div><br/><br/><br/>
+      <div class="form-group">
+          <label >Description:</label><br/>
+          <textarea formControlName="description" class="form-control" [ngClass]="{ 'invalid-field': submitted && f.description.errors }" rows="4" cols="50"></textarea>
+          <div *ngIf="submitted && f.description.errors" class="invalid-feedback">
+              <div *ngIf="f.description.errors.required">description is required</div>
+          </div>
+      </div><br/><br/><br/>
+    
+     
+      <div class="form-group">
+          <button [disabled]="loading" class="btn btn-primary">Submit</button>
+          <img *ngIf="loading" class="pl-3" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+      </div>
+  </form>
+  </div>
+</ng-template>
+
+<ng-template #DeleteNotes>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left w-100 text-center fs18 font-weight-normal">Delete Notes</h4>
+    <button type="button" class="close pull-right text-white font-weight-normal op1" aria-label="Close" (click)="closePopup()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="noteForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+          <label >Are you sure to delete Notes?</label><br/>
+          <button type="button"  
+          (click)="DeleteNotes()">ok</button>&nbsp;&nbsp;
+          <button type="button"  
+          (click)="closePopup()">cancel</button>
+      </div>
+      
+  </form>
+  </div>
+</ng-template>
